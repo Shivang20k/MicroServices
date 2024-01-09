@@ -1,8 +1,7 @@
 package com.micro.booking.service.Service;
 
-import com.micro.booking.service.Entity.Booking;
-import com.micro.booking.service.Entity.Flight;
-import com.micro.booking.service.Entity.ReturnFlightDetails;
+import com.micro.booking.service.Entity.*;
+import com.micro.booking.service.FeignClient.PassengerClient;
 import com.micro.booking.service.Repository.BookingRepository;
 import com.micro.booking.service.Repository.FlightRepository;
 import org.apache.commons.lang.RandomStringUtils;
@@ -20,6 +19,9 @@ public class BookingServiceImpl implements BookingService{
 
     @Autowired
     BookingRepository bookingRepository;
+
+    @Autowired
+    PassengerClient passengerClient;
 
     @Override
     public Flight createFlight(Flight flight) {
@@ -83,11 +85,25 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public List<Long> getAllFlightsForFlightId(Long fId) {
+    public List<PassengerInfoForFlightDetails> getAllFlightsForFlightId(Long fId) {
         List<Booking> bookings = bookingRepository.getAllBookingsForFlight(fId);
-        List<Long> passengerIds = bookings.stream().map(Booking::getPassengerId).toList();
-        // in future to do get Passenger Details from passengerIds
-        return passengerIds;
+        List<Passenger> passengers = bookings.stream()
+                                          .map(Booking::getPassengerId)
+                                          .map(id -> passengerClient.getPassengerFromWithoutFlightDetails(id))
+                                          .toList();
+        return passengers
+                .stream()
+                .map(p -> {
+                           return PassengerInfoForFlightDetails.builder()
+                                   .id(p.getId())
+                                   .mail(p.getMail())
+                                   .phone(p.getPhone())
+                                   .name(p.getName())
+                                   .PNR(bookings.get(passengers.indexOf(p)).getPNR())
+                                   .build();
+                          }
+                    )
+                .toList();
     }
 
     @Override

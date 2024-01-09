@@ -1,7 +1,9 @@
 package com.micro.booking.service.Controller;
 
 import com.micro.booking.service.Entity.Flight;
+import com.micro.booking.service.Entity.PassengerInfoForFlightDetails;
 import com.micro.booking.service.Entity.ReturnFlightDetails;
+import com.micro.booking.service.FeignClient.PassengerClient;
 import com.micro.booking.service.Service.BookingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,9 @@ public class BookingController {
 
     @Autowired
     private BookingServiceImpl bookingService;
+
+    @Autowired
+    private PassengerClient passengerClient;
 
     @PostMapping("/flight/create")
     public ResponseEntity<Flight> createFlight(@RequestBody Flight flight) {
@@ -37,7 +42,7 @@ public class BookingController {
     }
 
     @GetMapping("/flight/passengers/{fId}")
-    public ResponseEntity<List<Long>> getPassengersForFlight(@PathVariable Long fId) {
+    public ResponseEntity<List<PassengerInfoForFlightDetails>> getPassengersForFlight(@PathVariable Long fId) {
         return new ResponseEntity<>(bookingService.getAllFlightsForFlightId(fId), HttpStatus.FOUND);
     }
 
@@ -52,12 +57,12 @@ public class BookingController {
     }
 
     @GetMapping("/booking/passengerId/{passengerId}")
-    public ResponseEntity<List<ReturnFlightDetails>> getAllFlightBookingsForPassengerId(@PathVariable Long passengerId) {
-        return new ResponseEntity<>(bookingService.getAllFlightsForPassengerForPassengerId(passengerId), HttpStatus.FOUND);
+    public List<ReturnFlightDetails> getAllFlightBookingsForPassengerId(@PathVariable Long passengerId) {
+        return bookingService.getAllFlightsForPassengerForPassengerId(passengerId);
     }
 
     @GetMapping("/booking/pnr/{pnr}")
-    public ResponseEntity<ReturnFlightDetails> getFlightInfoFromPNR(@PathVariable String pnr) {
-        return new ResponseEntity<>(bookingService.getFlightInfoForPnr(pnr), HttpStatus.FOUND);
+    public ReturnFlightDetails getFlightInfoFromPNR(@PathVariable String pnr) {
+        return bookingService.getFlightInfoForPnr(pnr);
     }
 }

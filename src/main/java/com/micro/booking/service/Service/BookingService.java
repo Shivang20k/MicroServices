@@ -1,6 +1,7 @@
 package com.micro.booking.service.Service;
 
 import com.micro.booking.service.Entity.Flight;
+import com.micro.booking.service.Entity.PassengerInfoForFlightDetails;
 import com.micro.booking.service.Entity.ReturnFlightDetails;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface BookingService {
 
     public List<ReturnFlightDetails> getAllFlightsForPassengerForPassengerId(Long passengerId);
 
-    public List<Long> getAllFlightsForFlightId(Long fId);
+    public List<PassengerInfoForFlightDetails> getAllFlightsForFlightId(Long fId);
 
     public ReturnFlightDetails getFlightInfoForPnr(String pnr);
 }
